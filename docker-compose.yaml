@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:15.4
+    environment: 
+      - POSTGRES_USER=k8s 
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=k8s
+
+  server:
+    image: server:latest
+    environment:
+      - REPOSITORY=postgre
+      - DB_USER=k8s
+      - DB_PASSWORD=password
+      - DB_NAME=k8s
+      - DB_ADDRESS=db:5432
+      - HOST_ADDRESS=0.0.0.0:7992
+    ports:
+      - "7992:7992"
