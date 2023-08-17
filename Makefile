@@ -10,7 +10,7 @@ VERSION=$$(eval "git describe 2> /dev/null || echo v0.0.0-pre-$$(git rev-parse -
 GOVENDOR=test -d vendor || $(GOCMD) mod vendor # It is unlikely to get the private go packages in a container, so it is advised to run `go mod vendor` before running `docker build`
 GOBUILD=$(GOCMD) build -o ${BUILD_DIR} -ldflags "-X main.version=${VERSION}"
 
-all: main
+all: main docker
 
 .PHONY: lint
 lint:
@@ -33,3 +33,7 @@ main:
 	${GOVENDOR}
 	${GOBUILD}
 
+.PHONY: docker
+docker:
+	@echo "Building docker container for backend component"
+	docker build . -t k8s_sample_backend
