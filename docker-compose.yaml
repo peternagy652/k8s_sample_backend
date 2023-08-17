@@ -17,3 +17,8 @@ services:
       - HOST_ADDRESS=0.0.0.0:7992
     ports:
       - "7992:7992"
+
+  web:
+    image: frontend:latest
+    ports:
+      - "80:80"
