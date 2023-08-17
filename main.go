@@ -2,7 +2,9 @@ package main
 
 import (
 	"errors"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -40,10 +42,22 @@ func main() {
 		}
 
 		var err error
-		repo, err = repository.NewPostgreRepository(env.DBUser, env.DBPassword, env.DBName, env.DBAddress)
+		// Poor mans retry logic, please do not judge it's just a sample
+		retryCount := 0
+		for retryCount < 5 {
+			repo, err = repository.NewPostgreRepository(env.DBUser, env.DBPassword, env.DBName, env.DBAddress)
+			if err != nil {
+				e.Logger.Warnf("DB is not ready yet, retrying in 5 seconds for the %d. time.", retryCount+1)
+				time.Sleep(5 * time.Second)
+				continue
+			}
+
+			break
+		}
 		if err != nil {
 			e.Logger.Fatal(err)
 		}
+
 	}
 
 	e.Use(bindRepository(repo))
@@ -56,7 +70,9 @@ func main() {
 	e.POST("/api/v1/generate", handlers.GeneratePersons)
 	e.DELETE("/api/v1/persons", handlers.ClearPersons)
 
-	e.Logger.Fatal(e.Start(env.HostAddress))
+	if err := e.StartTLS(env.HostAddress, "/opt/ssl/localhost.crt", "/opt/ssl/localhost.key"); err != http.ErrServerClosed {
+		e.Logger.Fatal(err)
+	}
 }
 
 func getEnvironment() environment {
@@ -67,7 +83,7 @@ func getEnvironment() environment {
 
 	hostaddress := os.Getenv("HOST_ADDRESS")
 	if hostaddress == "" {
-		hostaddress = "0.0.0.0:7992"
+		hostaddress = "0.0.0.0:8443"
 	}
 
 	dbuser := os.Getenv("DB_USER")
