@@ -49,10 +49,12 @@ func main() {
 	e.Use(bindRepository(repo))
 
 	e.GET("/", handlers.Hello)
+	e.GET("/hello", handlers.Hello)
 	e.POST("/person", handlers.AddPersonHandler)
 	e.GET("/person/:id", handlers.GetPersonByIDHandler)
 	e.GET("/persons", handlers.GetPersonsHandler)
 	e.POST("/generate", handlers.GeneratePersons)
+	e.DELETE("/persons", handlers.ClearPersons)
 
 	e.Logger.Fatal(e.Start(env.HostAddress))
 }

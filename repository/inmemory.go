@@ -82,3 +82,12 @@ func (i *InmemoryRepository) DeletePersonByID(id string) error {
 
 	return &util.NotFoundError{}
 }
+
+func (i *InmemoryRepository) Clear() error {
+	i.personsLock.Lock()
+	defer i.personsLock.Unlock()
+
+	i.personCache = make([]model.Person, 0)
+
+	return nil
+}

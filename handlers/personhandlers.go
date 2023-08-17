@@ -130,3 +130,19 @@ func generatePerson(index int64) model.Person {
 		Age:  int32(rand.Intn(70) + 20),
 	}
 }
+
+func ClearPersons(c echo.Context) error {
+	defer c.Request().Body.Close()
+
+	repo := c.Get("repository").(repository.Repository)
+
+	c.Logger().Debug("Going to delete all Persons.")
+
+	err := repo.Clear()
+	if err != nil {
+		c.Logger().Error("Failed to delete data from repository: %s", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusOK)
+}

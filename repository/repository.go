@@ -10,4 +10,5 @@ type Repository interface {
 	GetPersons() ([]model.Person, error)
 	ModifyPerson(person model.Person) (model.Person, error)
 	DeletePersonByID(id string) error
+	Clear() error
 }

@@ -92,3 +92,12 @@ func (p *PostgresRepository) ModifyPerson(person model.Person) (model.Person, er
 func (p *PostgresRepository) DeletePersonByID(id string) error {
 	return &util.NotImplementedError{}
 }
+
+func (p *PostgresRepository) Clear() error {
+	_, err := p.DB.Model(&model.Person{}).Where("TRUE").Delete()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
